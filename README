@@ -1,0 +1,26 @@
+UART for FSM
+
+This project is a fork of "RS232" UART from:
+    
+    http://opencores.org/project,rs232_interface,overview
+
+This UART is designed to be used with finite state machine instead of
+microprocessor. Implementation differences are mostly shorter signal lengths.
+Transmission and receive end signals are asserted only for one clock cycle which makes it easier to interact with FSM.
+Transmission start signal needs to be only asserted for one clock cycle instead
+of several clock cycles before.
+
+UART clock generation is also made more accurate. Requested baud rate can only
+made exactly when the baud rate divides the clock signal frequency. When the
+baud rate doesn't divide the clock frequency the real baud rate is slightly off
+from the requested. Previously the real baud rate was always more or equal to
+the requested, but now it can be less if it's error is smaller.
+
+The real baud rate can be calculated as:
+
+    CLK_FREQ = Clock frequency
+    SER_FREQ = Requested baud rate
+
+    x = floor(CLK_FREQ/SER_FREQ)
+    Real baud rate = CLK_FREQ/x or CLK_FREQ*/(x+1), whichever is closer.
+
