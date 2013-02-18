@@ -4,17 +4,11 @@ This project is a fork of "RS232" UART from:
     
     http://opencores.org/project,rs232_interface,overview
 
-This UART is designed to be used with finite state machine instead of
-microprocessor. Implementation differences are mostly shorter signal lengths.
+This UART is designed to be used with finite state machine instead of microprocessor. Implementation differences are mostly shorter signal lengths.
 Transmission and receive end signals are asserted only for one clock cycle which makes it easier to interact with FSM.
-Transmission start signal needs to be only asserted for one clock cycle instead
-of several clock cycles before.
+Transmission start signal needs to be only asserted for one clock cycle instead of several clock cycles before.
 
-UART clock generation is also made more accurate. Requested baud rate can only
-made exactly when the baud rate divides the clock signal frequency. When the
-baud rate doesn't divide the clock frequency the real baud rate is slightly off
-from the requested. Previously the real baud rate was always more or equal to
-the requested, but now it can be less if it's error is smaller.
+UART clock generation is also made more accurate. Requested baud rate can only made exactly when the baud rate divides the clock signal frequency. When the baud rate doesn't divide the clock frequency the real baud rate is slightly off from the requested. Previously the real baud rate was always more or equal to the requested, but now it can be less if it's error is smaller.
 
 The real baud rate can be calculated as:
 
@@ -24,3 +18,31 @@ The real baud rate can be calculated as:
     x = floor(CLK_FREQ/SER_FREQ)
     Real baud rate = CLK_FREQ/x or CLK_FREQ*/(x+1), whichever is closer.
 
+
+Signals:
+
+'clk' is main clock.
+'rst' is active high reset signal.
+
+'rx' and 'tx' are serial data receive and transmit signals.
+
+'tx_req' is input signal to request sending data. UART will start on the next clock cycle to transmit data currently on 'tx_data', unless transmission is already going on in which case the signal is ignored.
+
+'tx_end' is transmission end signal. It's high for one clock cycle after finishing the transmission.
+
+'tx_data' is data to send.
+
+'rx_ready' signals that UART has finished receiving data and it's now ready to be read. This signal is high for one clock cycle.
+
+'rx_data' is the last received data.
+
+
+Serial settings:
+
+Even parity if PARITY_BIT generic is true else no parity.
+Two stopbits.
+Eight bits in byte.
+Baudrate is set with generic SER_FREQ.
+
+See examples/echo.py for example in setting up the serial port in Python 
+and examples/eco.vhd for using the UART.
